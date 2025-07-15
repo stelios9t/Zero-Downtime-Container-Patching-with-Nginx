@@ -12,12 +12,12 @@
     nginx_upstream_file: /etc/nginx/conf.d/upstream.conf
     tag_file: /home/ubuntu/last_deployed_image.txt
   roles:
-    - build_image # 1. Build image
-    - detect_vuln # 2. Check current container for vuln and image diff
-    - run_container # 3. Run container on temp port
-    - nginx_temp_switch # 4. Point nginx to temp and drain
-    - nginx_switch_to_new # 5. Remove old, start new, repoint nginx
-    - finalize_deployment # 6. Save tag, clean up
+    - build_image
+    - detect_vuln
+    - run_container
+    - nginx_temp_switch
+    - nginx_switch_to_new
+    - finalize_deployment
 
   handlers:
     - import_tasks: handlers/main.yml
