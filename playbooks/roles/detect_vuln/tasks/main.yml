@@ -19,13 +19,13 @@
     vuln_found: "{{ (trivy_scan.stdout | length) > 0 }}"
 
 - name: Get current running container image (full name)
-  shell: docker inspect --format='{{.Config.Image}}' {{ container_name }}
+  shell: docker inspect --format='{{ "{{" }}.Config.Image{{ "}}" }}' {{ container_name }}
   register: running_image
   failed_when: running_image.rc != 0 and 'No such container' not in running_image.stderr
   changed_when: false
 
 - name: Get image ID of running container
-  shell: docker inspect --format='{{.Image}}' {{ container_name }}
+  shell: docker inspect --format='{{ "{{" }} .Image {{ "}}" }}' {{ container_name }}
   register: running_image_id
   failed_when: running_image_id.rc != 0 and "No such container" not in running_image_id.stderr
   changed_when: false

@@ -10,3 +10,8 @@
   copy:
     content: "{{ image_tag }}"
     dest: "{{ tag_file }}"
+
+- name: Stop and remove temp container
+  shell: |
+    docker stop {{ container_name }}-temp || true
+    docker rm {{ container_name }}-temp || true

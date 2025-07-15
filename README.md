@@ -16,6 +16,7 @@ Modern applications often run in containers that are built on top of base images
 
 The main focus is on automating safe, zero-downtime upgrades of a Flask app deployed in Docker containers on **EC2 instances**, by:
 
+- Mirroring **blue/green** deployment strategy at the container level
 - Detecting base image vulnerabilities with **Trivy**
 - Rebuilding images when the base layer (Ubuntu) changes
 - Deploying new containers on a temporary port
@@ -26,14 +27,21 @@ The main focus is on automating safe, zero-downtime upgrades of a Flask app depl
 
 ## Tech Stack
 
-**Ansible**
-**Docker**
-**Nginx**  
-**Trivy**
-**AWS EC2**
+- **Ansible**
+- **Docker**
+- **Nginx**
+- **Trivy**
+- **AWS EC2**
 
 ## Overview Diagram
 
 ![diagram](docs/assets/overview-diagram.png)
 
 > Diagram illustrates control flow from Ansible to EC2 instances, container lifecycle, and Nginx port switching.
+
+## Docs
+
+- [full EC2 setup guide](docs/aws-ec2-setup.md) for details.
+- [deployment flow documentation](docs/deployment-flow.md) for a step-by-step explanation.
+- [check the rollback strategy](docs/rollback.md).
+- [check directory structure](docs/ansible-directory.md)

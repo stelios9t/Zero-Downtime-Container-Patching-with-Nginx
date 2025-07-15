@@ -20,7 +20,7 @@
         rollback_image_tag: "{{ previous_tag_raw.content | b64decode | trim }}"
 
     - name: Run rollback container on temp port
-      shell: docker run -d --name {{ container_name }}-rollback -p {{ temp_port }}:5000 {{ image_name }}:{{ rollback_image_tag }}
+      shell: docker run -d --name {{ container_name }}-temp -p {{ temp_port }}:5000 {{ image_name }}:{{ rollback_image_tag }}
 
     - name: Wait for temp rollback container
       wait_for:
@@ -75,8 +75,8 @@
 
     - name: Remove temp rollback container
       shell: |
-        docker stop {{ container_name }}-rollback || true
-        docker rm {{ container_name }}-rollback || true
+        docker stop {{ container_name }}-temp || true
+        docker rm {{ container_name }}-temp || true
 
   handlers:
     - name: reload nginx

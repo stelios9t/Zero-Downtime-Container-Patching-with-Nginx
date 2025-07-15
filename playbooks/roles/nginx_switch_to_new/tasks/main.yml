@@ -4,7 +4,7 @@
     docker rm {{ container_name }} || true
 
 - name: Run new container on original port
-  shell: docker run -d --name {{ container_name }} -p {{ orig_port }}:5000 {{ image_name }}:{{ image_tag }}
+  shell: docker run --pull=never -d --name {{ container_name }} -p {{ orig_port }}:5000 {{ image_name }}:{{ image_tag }}
 
 - name: Update Nginx to point back to original port
   copy:

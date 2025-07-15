@@ -1,9 +1,0 @@
-- name: Remove leftover temp container if exists
-  shell: |
-    docker rm -f {{ container_name }}-temp || true
-
-- name: Build Docker image with semantic version tag
-  shell: docker build -t {{ image_name }}:{{ image_tag }} -f {{ dockerfile_path }} .
-  args:
-    chdir: "{{ app_dir }}"
-  register: build_result

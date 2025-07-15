@@ -4,13 +4,14 @@
   vars:
     container_name: flask-app
     image_name: flask-app
-    image_tag: "v{{ lookup('pipe', 'date +%y%m%d%H%M') }}"
     dockerfile_path: /home/ubuntu/flask-app/Dockerfile
     app_dir: /home/ubuntu/flask-app
     orig_port: 5000
     temp_port: 5001
     nginx_upstream_file: /etc/nginx/conf.d/upstream.conf
     tag_file: /home/ubuntu/last_deployed_image.txt
+    rollback_tag_file: /home/ubuntu/last_deployed_image.txt.previous
+
   roles:
     - build_image
     - detect_vuln

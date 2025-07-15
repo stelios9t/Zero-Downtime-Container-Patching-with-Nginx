@@ -1,9 +1,0 @@
-- name: Run new container on temp port
-  shell: docker run -d --name {{ container_name }}-temp -p {{ temp_port }}:5000 {{ image_name }}:{{ image_tag }}
-
-- name: Wait for new container to be healthy
-  wait_for:
-    host: localhost
-    port: "{{ temp_port }}"
-    delay: 5
-    timeout: 30

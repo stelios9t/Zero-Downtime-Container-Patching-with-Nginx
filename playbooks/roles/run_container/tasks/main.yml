@@ -1,0 +1,23 @@
+- name: Get currently running image tag
+  shell: docker ps --filter "name={{ container_name }}" --format "{{ '{{.Image}}' }}"
+  register: current_running_image
+  changed_when: false
+  failed_when: false
+
+- name: Extract tag from image string
+  set_fact:
+    rollback_image_tag: "{{ current_running_image.stdout | regex_replace('^.*:(\\d+)$', '\\1') }}"
+
+- name: Store rollback tag before deployment
+  copy:
+    content: "{{ rollback_image_tag }}"
+    dest: "{{ rollback_tag_file }}"
+
+- name: Run new container on temp port
+  shell: docker run -d --name {{ container_name }}-temp -p {{ temp_port }}:5000 {{ image_name }}:{{ image_tag }}
+
+- name: Wait for new container to be healthy
+  wait_for:
+    port: "{{ temp_port }}"
+    delay: 5
+    timeout: 30

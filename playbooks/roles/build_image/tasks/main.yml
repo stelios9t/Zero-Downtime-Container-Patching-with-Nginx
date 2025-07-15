@@ -1,0 +1,41 @@
+- name: Remove leftover temp container if exists
+  shell: |
+    docker rm -f {{ container_name }}-temp || true
+
+- name: Get current running image tag
+  shell: docker ps --filter "name={{ container_name }}" --format "{{ '{{.Image}}' }}"
+  register: current_image
+  changed_when: false
+  failed_when: false
+
+- name: Extract raw tag string
+  set_fact:
+    current_tag_raw: "{{ current_image.stdout | regex_search('\\d+') | default('0') }}"
+
+- name: Debug current_tag_raw
+  debug:
+    msg: "Raw tag: {{ current_tag_raw }}"
+
+- name: Convert raw tag string to int
+  set_fact:
+    current_tag_num: "{{ current_tag_raw | int }}"
+
+- name: Debug current_tag_num and its type
+  debug:
+    msg:
+      - "Value: {{ current_tag_num }}"
+      - "Type: {{ current_tag_num | type_debug }}"
+
+- name: Increment tag number
+  set_fact:
+    image_tag_num: "{{ (current_tag_num | int) + 1 }}"
+
+- name: Set new image tag
+  set_fact:
+    image_tag: "{{ image_tag_num | string }}"
+
+- name: Build Docker image with semantic version tag
+  shell: docker build -t {{ image_name }}:{{ image_tag }} -f {{ dockerfile_path }} .
+  args:
+    chdir: "{{ app_dir }}"
+  register: build_result
