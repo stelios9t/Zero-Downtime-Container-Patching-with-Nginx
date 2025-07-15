@@ -1,5 +1,6 @@
 # Ansible Directory Structure
 
+```text
 ├── ansible/ # All Ansible-related files
 │ ├── playbooks/ # Playbooks and supporting components
 │ │ ├── site.yml # Main playbook
@@ -13,3 +14,4 @@
 │ │ │ └── finalize_deployment/ # Finalizes deployment and cleanup
 │ │ ├── handlers/ # Includes handler tasks that are only run when notified by other tasks
 │ │ │ └── main/ # Reloads Nginx
+```
