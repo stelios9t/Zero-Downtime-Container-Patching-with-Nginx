@@ -4,7 +4,7 @@ This project demonstrates how to achieve **zero downtime patching** of Docker co
 
 ## The Problem
 
-“How can we safely patch base image vulnerabilities in running Docker containers across a **fleet of EC2 instances** without downtime?”
+**How can we safely patch base image vulnerabilities in running Docker containers across a fleet of EC2 instances without downtime?**
 
 Modern applications often run in containers that are built on top of base images. These base images can accumulate critical vulnerabilities over time, but teams often skip patching because:
 
