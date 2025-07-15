@@ -41,7 +41,7 @@ The main focus is on automating safe, zero-downtime upgrades of a Flask app depl
 
 ## Docs
 
-- [full EC2 setup guide](docs/aws-ec2-setup.md) for details.
+- [full EC2 setup guide](docs/aws-ec2.md) for details.
 - [deployment flow documentation](docs/deployment-flow.md) for a step-by-step explanation.
 - [check the rollback strategy](docs/rollback.md).
 - [check directory structure](docs/ansible-directory.md)
