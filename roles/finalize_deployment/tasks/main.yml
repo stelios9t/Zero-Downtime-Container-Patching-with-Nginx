@@ -1,0 +1,12 @@
+- name: Backup current deployed tag (if exists)
+  shell: |
+    if [ -f {{ tag_file }} ]; then
+      cp {{ tag_file }} {{ tag_file }}.previous
+    fi
+  args:
+    executable: /bin/bash
+
+- name: Save new deployed image tag
+  copy:
+    content: "{{ image_tag }}"
+    dest: "{{ tag_file }}"

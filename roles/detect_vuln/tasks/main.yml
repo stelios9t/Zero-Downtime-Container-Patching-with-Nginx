@@ -1,0 +1,52 @@
+- name: Get current running container ID
+  shell: docker ps -qf "name={{ container_name }}"
+  register: container_id
+  changed_when: false
+
+- name: Fail if container is not running
+  fail:
+    msg: "No running container found for {{ container_name }}"
+  when: container_id.stdout == ""
+
+- name: Scan running container for critical vulnerabilities
+  shell: trivy container --severity CRITICAL --quiet --no-progress {{ container_id.stdout }}
+  register: trivy_scan
+  changed_when: false
+  failed_when: false
+
+- name: Set vuln_found if critical vulnerabilities are found
+  set_fact:
+    vuln_found: "{{ (trivy_scan.stdout | length) > 0 }}"
+
+- name: Get current running container image (full name)
+  shell: docker inspect --format='{{.Config.Image}}' {{ container_name }}
+  register: running_image
+  failed_when: running_image.rc != 0 and 'No such container' not in running_image.stderr
+  changed_when: false
+
+- name: Get image ID of running container
+  shell: docker inspect --format='{{.Image}}' {{ container_name }}
+  register: running_image_id
+  failed_when: running_image_id.rc != 0 and "No such container" not in running_image_id.stderr
+  changed_when: false
+
+- name: Get image ID of newly built image
+  shell: docker images --no-trunc -q {{ image_name }}:{{ image_tag }}
+  register: new_image_id
+  changed_when: false
+
+- name: Compare image IDs
+  set_fact:
+    image_changed: "{{ running_image_id.stdout != new_image_id.stdout }}"
+
+- name: Decide if upgrade is needed
+  set_fact:
+    needs_upgrade: "{{ (image_changed or vuln_found) }}"
+
+- name: Debug upgrade decision
+  debug:
+    msg: "Upgrade needed? {{ needs_upgrade }} (Image changed: {{ image_changed }}, Vulns: {{ vuln_found }} })"
+
+- name: Stop play if no upgrade needed
+  meta: end_play
+  when: not needs_upgrade

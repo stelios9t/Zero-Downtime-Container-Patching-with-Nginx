@@ -1,0 +1,19 @@
+- name: Update Nginx to point to temp port
+  copy:
+    dest: "{{ nginx_upstream_file }}"
+    content: |
+      upstream flask_backend {
+          server localhost:{{ temp_port }};
+      }
+
+      server {
+          listen 80;
+          location / {
+              proxy_pass http://flask_backend;
+          }
+      }
+  notify: reload nginx
+
+- name: Wait for connection draining
+  pause:
+    seconds: 10

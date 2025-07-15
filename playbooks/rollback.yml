@@ -1,0 +1,85 @@
+- name: Roll back to previous stable image
+  hosts: docker_hosts
+  become: true
+  vars:
+    container_name: flask-app
+    image_name: flask-app
+    rollback_tag_file: /home/ubuntu/last_deployed_image.txt.previous
+    orig_port: 5000
+    temp_port: 5001
+    nginx_upstream_file: /etc/nginx/conf.d/upstream.conf
+
+  tasks:
+    - name: Read previous tag
+      slurp:
+        src: "{{ rollback_tag_file }}"
+      register: previous_tag_raw
+
+    - name: Decode previous tag
+      set_fact:
+        rollback_image_tag: "{{ previous_tag_raw.content | b64decode | trim }}"
+
+    - name: Run rollback container on temp port
+      shell: docker run -d --name {{ container_name }}-rollback -p {{ temp_port }}:5000 {{ image_name }}:{{ rollback_image_tag }}
+
+    - name: Wait for temp rollback container
+      wait_for:
+        host: localhost
+        port: "{{ temp_port }}"
+        delay: 5
+        timeout: 30
+
+    - name: Point Nginx to temp port
+      copy:
+        dest: "{{ nginx_upstream_file }}"
+        content: |
+          upstream flask_backend {
+              server localhost:{{ temp_port }};
+          }
+
+          server {
+              listen 80;
+              location / {
+                  proxy_pass http://flask_backend;
+              }
+          }
+      notify: reload nginx
+
+    - name: Wait for draining
+      pause:
+        seconds: 10
+
+    - name: Stop and remove broken container
+      shell: |
+        docker stop {{ container_name }} || true
+        docker rm {{ container_name }} || true
+
+    - name: Run rollback container on original port
+      shell: docker run -d --name {{ container_name }} -p {{ orig_port }}:5000 {{ image_name }}:{{ rollback_image_tag }}
+
+    - name: Point Nginx back to original port
+      copy:
+        dest: "{{ nginx_upstream_file }}"
+        content: |
+          upstream flask_backend {
+              server localhost:{{ orig_port }};
+          }
+
+          server {
+              listen 80;
+              location / {
+                  proxy_pass http://flask_backend;
+              }
+          }
+      notify: reload nginx
+
+    - name: Remove temp rollback container
+      shell: |
+        docker stop {{ container_name }}-rollback || true
+        docker rm {{ container_name }}-rollback || true
+
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
