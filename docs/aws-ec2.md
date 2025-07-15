@@ -30,10 +30,10 @@ sudo systemctl reload nginx
 
 > EC2 Instances running
 
-[sg](assets/seucrity%20groups.png)
+![sg](assets/seucrity%20groups.png)
 
 > Security groups rules
 
-[keys](assets/key-pair-ui.png)
+![keys](assets/key-pair-ui.png)
 
 > Key Pairs
