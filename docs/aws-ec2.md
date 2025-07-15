@@ -2,7 +2,7 @@
 
 Two EC2 instances are launched with the following specifications:
 
-- t3.micro
+- t2.micro
 - Ubuntu 20.04
 - Create and download a key pair (ansible-key.pem)
 - Enable port 22 (SSH) and port 80 (Nginx) in the security group
